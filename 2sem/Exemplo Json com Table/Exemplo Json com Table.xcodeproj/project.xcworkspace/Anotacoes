@@ -1,0 +1,5 @@
+-Verificar o link do Json
+Ex: https://itunes.apple.com/br/rss/topfreeapplications/limit=10/json
+
+- Verificar no JSON Viewer
+https://jsonviewer.stack.hu/#https://itunes.apple.com/br/rss/topfreeapplications/limit=10/json
