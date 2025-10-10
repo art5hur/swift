@@ -1,0 +1,4 @@
+Erro de concatenação do link do Json:
+
+\(numTxt.text!)
+let jsonUrlString = "https://swapi.dev/api/starships/\(numTxt.text!)"
