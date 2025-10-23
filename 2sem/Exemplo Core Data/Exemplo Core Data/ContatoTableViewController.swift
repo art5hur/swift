@@ -10,17 +10,17 @@ import CoreData
 
 
 class ContatoTableViewController: UITableViewController {
-
+    
     var pessoas: [NSManagedObject] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {return}
+        
         let managedContext = appDelegate.persistentContainer.viewContext
         
         let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "Pessoa")
@@ -30,10 +30,11 @@ class ContatoTableViewController: UITableViewController {
         do{
             pessoas = try managedContext.fetch(fetchRequest)
         }catch let error as NSError{
-            print("Não foi possível salvar \(error), \(error.userInfo)")
+            print("Não foi possível salvar  \(error), \(error.userInfo)")
         }
         self.tableView.reloadData()
         
+   
     }
 
     // MARK: - Table view data source
@@ -48,19 +49,16 @@ class ContatoTableViewController: UITableViewController {
         return pessoas.count
     }
 
-    
+   
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
         let pessoa = pessoas[indexPath.row]
         // Configure the cell...
-
         cell.textLabel?.text = pessoa.value(forKey: "nome") as? String
-        cell.textLabel?.text = pessoa.value(forKey: "email") as? String
-        
-        
+        cell.detailTextLabel?.text = pessoa.value(forKey: "email") as? String
         return cell
     }
-    
+   
 
     /*
     // Override to support conditional editing of the table view.
@@ -70,17 +68,30 @@ class ContatoTableViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else {return}
+            let managedContext = appDelegate.persistentContainer.viewContext
+            
+            managedContext.delete(pessoas[indexPath.row])
+            
+            do{
+                try managedContext.save()
+                pessoas.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+
+            }catch let error as NSError{
+                print("Não foi possível apagar o registro \(error), \(error.userInfo)")
+            }
+            
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }    
     }
-    */
+    
 
     /*
     // Override to support rearranging the table view.
@@ -97,14 +108,20 @@ class ContatoTableViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
+        
+        if segue.identifier == "daTableParaAlterarSegue"{
+            let vc = segue.destination as! ContatoViewController
+            let pessoaSelecionada:NSManagedObject = pessoas[self.tableView.indexPathForSelectedRow!.item]
+            vc.pessoaVindoDaTable = pessoaSelecionada
+            
+        }
+        
     }
-    */
-
 }
